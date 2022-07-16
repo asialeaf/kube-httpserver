@@ -1,14 +1,16 @@
-package kubeclient
+package kubernetes
 
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func ClientTest() {
@@ -47,4 +49,24 @@ func ClientTest() {
 
 		time.Sleep(10 * time.Second)
 	}
+}
+
+func NewClient(kubeConfig string) (*kubernetes.Clientset, error) {
+	data, err := ioutil.ReadFile(kubeConfig)
+	if err != nil {
+		return nil, err
+	}
+	config, err := clientcmd.NewClientConfigFromBytes(data)
+	if err != nil {
+		return nil, err
+	}
+	restConfig, err := config.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+	client, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
