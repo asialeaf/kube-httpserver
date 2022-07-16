@@ -1,39 +1,61 @@
 package pod
 
 import (
-	"context"
 	"fmt"
-	"time"
 
-	"k8s.io/apimachinery/pkg/api/errors"
+	appsv1 "k8s.io/api/apps/v1"
+	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
 func CreatePod(clientset *kubernetes.Clientset, env_gitsource string, env_callback string) {
-	for {
-		// get pods in all the namespaces by omitting namespace
-		// Or specify namespace to get pods in particular namespace
-		pods, err := clientset.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
-		if err != nil {
-			panic(err.Error())
-		}
-		fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
 
-		// Examples for error handling:
-		// - Use helper functions e.g. errors.IsNotFound()
-		// - And/or cast to StatusError and use its properties like e.g. ErrStatus.Message
-		_, err = clientset.CoreV1().Pods("default").Get(context.TODO(), "example-xxxxx", metav1.GetOptions{})
-		if errors.IsNotFound(err) {
-			fmt.Printf("Pod example-xxxxx not found in default namespace\n")
-		} else if statusError, isStatus := err.(*errors.StatusError); isStatus {
-			fmt.Printf("Error getting pod %v\n", statusError.ErrStatus.Message)
-		} else if err != nil {
-			panic(err.Error())
-		} else {
-			fmt.Printf("Found example-xxxxx pod in default namespace\n")
-		}
+	// 创建一个Pod
 
-		time.Sleep(10 * time.Second)
+	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
+	deployment := &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "demo-gitops",
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: int32Ptr(1),
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"app": "gitops",
+				},
+			},
+			Template: apiv1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						"app": "gitops",
+					},
+				},
+				Spec: apiv1.PodSpec{
+					Containers: []apiv1.Container{
+						{
+							Name:  "web",
+							Image: "nginx:1.12",
+							Ports: []apiv1.ContainerPort{
+								{
+									Name:          "http",
+									Protocol:      apiv1.ProtocolTCP,
+									ContainerPort: 80,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
+	// Create Deployment
+	fmt.Println("Creating GitOps deployment...")
+	result, err := deploymentsClient.Create(deployment)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
 }
+
+func int32Ptr(i int32) *int32 { return &i }
