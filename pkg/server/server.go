@@ -3,6 +3,8 @@ package server
 import (
 	"net/http"
 
+	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/client/kubernetes"
+	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/core/pod"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +25,8 @@ func Demo() {
 		// }
 
 		//业务逻辑
+		client, _ := kubernetes.NewRestClient()
+		pod.CreatePod(client, json.GitSource, json.CallBack)
 
 		c.JSON(http.StatusOK, gin.H{"status": "success"})
 	})
