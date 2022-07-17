@@ -1,7 +1,9 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/client/kubernetes"
 	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/core/pod"
@@ -25,9 +27,18 @@ func Demo() {
 		// }
 
 		//业务逻辑
-		client, _ := kubernetes.NewRestClient()
-		pod.CreatePod(client, json.GitSource, json.CallBack)
+		// client, _ := kubernetes.NewRestClient()
+		client, _ := kubernetes.NewClient("/root/.kube/config")
+		_, err := pod.CreatePod(client, json.GitSource, json.CallBack)
+		if err != nil {
+			panic(err)
+		}
 
+		time.Sleep(10 * time.Second)
+		gitOpsPod, _ := pod.GetPod(client, "demo-gitops", "default")
+		podStatus := pod.GetPodStatus(gitOpsPod)
+
+		fmt.Println(podStatus)
 		c.JSON(http.StatusOK, gin.H{"status": "success"})
 	})
 

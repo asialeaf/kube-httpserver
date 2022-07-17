@@ -9,13 +9,16 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func CreatePod(clientset *kubernetes.Clientset, env_gitsource string, env_callback string) {
+// GitOps Controller，Pod运行完成删除Pod
+
+func CreatePod(clientset *kubernetes.Clientset, env_gitsource string, env_callback string) (*apiv1.Pod, error) {
 	// 创建一个GitOps Pod
 	namespace := "default"
+	gitOpsPodName := "demo-gitops"
 	podsClient := clientset.CoreV1().Pods(namespace)
 	pod := &apiv1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "demo-gitops",
+			Name: gitOpsPodName,
 			Labels: map[string]string{
 				"app": "gitops",
 			},
@@ -44,57 +47,39 @@ func CreatePod(clientset *kubernetes.Clientset, env_gitsource string, env_callba
 		panic(err)
 	}
 	fmt.Printf("Created gitops pod %q.\n", result.GetObjectMeta().GetName())
-
-	// GitOps Controller，Pod运行完成删除Pod
-
-	//List && Watch GitOps Pod
-
-	// // 创建一个Deployment
-	// deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
-
-	// deployment := &appsv1.Deployment{
-	// 	ObjectMeta: metav1.ObjectMeta{
-	// 		Name: "demo-gitops",
-	// 	},
-	// 	Spec: appsv1.DeploymentSpec{
-	// 		Replicas: int32Ptr(1),
-	// 		Selector: &metav1.LabelSelector{
-	// 			MatchLabels: map[string]string{
-	// 				"app": "gitops",
-	// 			},
-	// 		},
-	// 		Template: apiv1.PodTemplateSpec{
-	// 			ObjectMeta: metav1.ObjectMeta{
-	// 				Labels: map[string]string{
-	// 					"app": "gitops",
-	// 				},
-	// 			},
-	// 			Spec: apiv1.PodSpec{
-	// 				Containers: []apiv1.Container{
-	// 					{
-	// 						Name:  "web",
-	// 						Image: "nginx:1.12",
-	// 						Ports: []apiv1.ContainerPort{
-	// 							{
-	// 								Name:          "http",
-	// 								Protocol:      apiv1.ProtocolTCP,
-	// 								ContainerPort: 80,
-	// 							},
-	// 						},
-	// 					},
-	// 				},
-	// 			},
-	// 		},
-	// 	},
-	// }
-	// // Create Deployment
-	// fmt.Println("Creating gitops deployment...")
-	// result2, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Printf("Created gitops deployment %q.\n", result2.GetObjectMeta().GetName())
-
+	return result, err
 }
 
-// func int32Ptr(i int32) *int32 { return &i }
+// List && Watch GitOps Pod
+
+// Get Pod
+func GetPod(clientset *kubernetes.Clientset, podName, namespace string) (*apiv1.Pod, error) {
+	return clientset.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
+}
+
+// 获取Pod状态
+func GetPodStatus(pod *apiv1.Pod) string {
+	for _, cond := range pod.Status.Conditions {
+		if string(cond.Type) == ContainersReady {
+			if string(cond.Status) != ConditionTrue {
+				return "Unavailable"
+			}
+		} else if string(cond.Type) == PodInitialized && string(cond.Status) != ConditionTrue {
+			return "Initializing"
+		} else if string(cond.Type) == PodReady {
+			if string(cond.Status) != ConditionTrue {
+				return "Unavailable"
+			}
+			for _, containerState := range pod.Status.ContainerStatuses {
+				if !containerState.Ready {
+					return "Unavailable"
+				}
+			}
+		} else if string(cond.Type) == PodScheduled && string(cond.Status) != ConditionTrue {
+			return "Scheduling"
+		}
+	}
+	return string(pod.Status.Phase)
+}
+
+//Delete Pod
