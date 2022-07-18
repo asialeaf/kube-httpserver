@@ -33,13 +33,17 @@ func Demo() {
 		if err != nil {
 			panic(err)
 		}
+		c.JSON(http.StatusOK, gin.H{"status": "success"})
 
 		time.Sleep(10 * time.Second)
 		gitOpsPod, _ := pod.GetPod(client, "demo-gitops", "default")
 		podStatus := pod.GetPodStatus(gitOpsPod)
-
 		fmt.Println(podStatus)
-		c.JSON(http.StatusOK, gin.H{"status": "success"})
+
+		if podStatus == "Running" {
+			time.Sleep(3 * time.Second)
+			pod.DeletePod(client, "demo-gitops", "default")
+		}
 	})
 
 	router.Run(":8080")

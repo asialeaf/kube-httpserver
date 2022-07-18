@@ -47,6 +47,7 @@ func CreatePod(clientset *kubernetes.Clientset, env_gitsource string, env_callba
 		panic(err)
 	}
 	fmt.Printf("Created gitops pod %q.\n", result.GetObjectMeta().GetName())
+
 	return result, err
 }
 
@@ -83,3 +84,13 @@ func GetPodStatus(pod *apiv1.Pod) string {
 }
 
 //Delete Pod
+func DeletePod(clientset *kubernetes.Clientset, podName, namespace string) {
+	fmt.Println("Deleting Pod...")
+	deletePolicy := metav1.DeletePropagationForeground
+	if err := clientset.CoreV1().Pods(namespace).Delete(context.TODO(), podName, metav1.DeleteOptions{
+		PropagationPolicy: &deletePolicy,
+	}); err != nil {
+		panic(err)
+	}
+	fmt.Println("Deleted Pod.")
+}
