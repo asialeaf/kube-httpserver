@@ -9,9 +9,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-// GitOps Controller，Pod运行完成删除Pod
-
-func CreatePod(clientset *kubernetes.Clientset, env_gitsource, env_callback, env_gitpath string) (*apiv1.Pod, error) {
+func CreatePod(clientset *kubernetes.Clientset, env_gitsource, env_gitpath, env_callback string) (*apiv1.Pod, error) {
 
 	// 创建一个GitOps Pod
 	namespace := "default"
@@ -21,7 +19,7 @@ func CreatePod(clientset *kubernetes.Clientset, env_gitsource, env_callback, env
 		ObjectMeta: metav1.ObjectMeta{
 			Name: gitOpsPodName,
 			Labels: map[string]string{
-				"app": "gitops",
+				"app": gitOpsPodName,
 			},
 		},
 		Spec: apiv1.PodSpec{
@@ -33,7 +31,7 @@ func CreatePod(clientset *kubernetes.Clientset, env_gitsource, env_callback, env
 			},
 			Containers: []apiv1.Container{
 				{
-					Name:  "gitops",
+					Name:  gitOpsPodName,
 					Image: "kubectl:v1.0",
 					Ports: []apiv1.ContainerPort{
 						{
@@ -91,24 +89,22 @@ func CreatePod(clientset *kubernetes.Clientset, env_gitsource, env_callback, env
 		},
 	}
 	// Create Pod
-	fmt.Println("Creating gitops pod...")
+	fmt.Println("Creating pod...")
 	result, err := podsClient.Create(context.TODO(), pod, metav1.CreateOptions{})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Created gitops pod %q.\n", result.GetObjectMeta().GetName())
+	fmt.Printf("Created pod %q.\n", result.GetObjectMeta().GetName())
 
 	return result, err
 }
-
-// List && Watch GitOps Pod
 
 // Get Pod
 func GetPod(clientset *kubernetes.Clientset, podName, namespace string) (*apiv1.Pod, error) {
 	return clientset.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
 }
 
-// 获取Pod状态
+// Get Pod Status
 func GetPodStatus(pod *apiv1.Pod) string {
 	// for _, cond := range pod.Status.Conditions {
 	// 	if string(cond.Type) == ContainersReady {
@@ -133,14 +129,14 @@ func GetPodStatus(pod *apiv1.Pod) string {
 	return string(pod.Status.Phase)
 }
 
-//Delete Pod
+// Delete Pod
 func DeletePod(clientset *kubernetes.Clientset, podName, namespace string) {
-	fmt.Println("Deleting Pod...")
+	fmt.Printf("Deleting %s Pod...\n", podName)
 	deletePolicy := metav1.DeletePropagationForeground
 	if err := clientset.CoreV1().Pods(namespace).Delete(context.TODO(), podName, metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}); err != nil {
 		panic(err)
 	}
-	fmt.Println("Deleted Pod.")
+	fmt.Printf("Deleted Pod.\n")
 }

@@ -9,6 +9,6 @@ import (
 func main() {
 	// fmt.Println("clinet-go 测试...")
 	// kubeclient.ClientTest()
-	fmt.Println("httpserver 测试...")
+	fmt.Println("gitops httpserver ...")
 	server.Demo()
 }

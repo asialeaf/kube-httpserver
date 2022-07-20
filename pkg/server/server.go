@@ -1,19 +1,17 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
-	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/client/kubernetes"
-	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/core/pod"
+	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/core/controller"
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 )
 
 func Demo() {
 	router := gin.Default()
 
-	router.POST("/deploy", func(c *gin.Context) {
+	router.POST("/gitops/deploy", func(c *gin.Context) {
 		var json Data
 		if err := c.ShouldBindJSON(&json); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -21,29 +19,15 @@ func Demo() {
 		}
 
 		//参数校验
-		// if json.GitSource != "manu" || json.CallBack != "123" {
-		// 	c.JSON(http.StatusInternalServerError, gin.H{"status": "参数错误"})
-		// 	return
-		// }
+		if !govalidator.IsURL(json.GitSource) || !govalidator.IsURL(json.CallBack) {
+			c.JSON(http.StatusInternalServerError, gin.H{"status": "参数错误"})
+			return
+		}
 
 		//业务逻辑
-		// client, _ := kubernetes.NewRestClient()
-		client, _ := kubernetes.NewClient("/root/.kube/config")
-		_, err := pod.CreatePod(client, json.GitSource, json.CallBack, json.GitPath)
-		if err != nil {
-			panic(err)
-		}
+		go controller.Handler(json.GitSource, json.GitPath, json.CallBack)
 		c.JSON(http.StatusOK, gin.H{"status": "success"})
 
-		time.Sleep(10 * time.Second)
-		gitOpsPod, _ := pod.GetPod(client, "demo-gitops", "default")
-		podStatus := pod.GetPodStatus(gitOpsPod)
-		fmt.Printf("Pod Status: %s\n", podStatus)
-
-		if podStatus == "Succeeded" {
-			time.Sleep(3 * time.Second)
-			pod.DeletePod(client, "demo-gitops", "default")
-		}
 	})
 
 	router.Run(":8080")
