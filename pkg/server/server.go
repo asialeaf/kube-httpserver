@@ -29,7 +29,7 @@ func Demo() {
 		//业务逻辑
 		// client, _ := kubernetes.NewRestClient()
 		client, _ := kubernetes.NewClient("/root/.kube/config")
-		_, err := pod.CreatePod(client, json.GitSource, json.CallBack)
+		_, err := pod.CreatePod(client, json.GitSource, json.CallBack, json.GitPath)
 		if err != nil {
 			panic(err)
 		}
@@ -38,9 +38,9 @@ func Demo() {
 		time.Sleep(10 * time.Second)
 		gitOpsPod, _ := pod.GetPod(client, "demo-gitops", "default")
 		podStatus := pod.GetPodStatus(gitOpsPod)
-		fmt.Println(podStatus)
+		fmt.Printf("Pod Status: %s\n", podStatus)
 
-		if podStatus == "Running" {
+		if podStatus == "Succeeded" {
 			time.Sleep(3 * time.Second)
 			pod.DeletePod(client, "demo-gitops", "default")
 		}
