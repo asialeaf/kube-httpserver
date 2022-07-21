@@ -6,7 +6,7 @@
 
 #### 部署步骤
 
-使用[ko](https://github.com/google/ko)一件部署
+使用[ko](https://github.com/google/ko)一键部署
 
 提前安装ko
 
