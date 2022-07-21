@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-httpserver
+  namespace: default
+  labels:
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: kube-httpserver
+spec:
+  selector:
+    matchLabels: &labels
+      app: kube-httpserver
+  template:
+    metadata:
+      labels:
+        <<: *labels
+        app.kubernetes.io/version: devel
+        app.kubernetes.io/name: kube-httpserver
+    spec:
+      hostAliases:
+      - ip : "192.168.50.225"
+        hostnames:
+        - "cluster-endpoint"
+      containers:
+      - name: kube-httpserver
+        image: ko://git.harmonycloud.cn/yeyazhou/kube-httpserver/cmd/kube-httpserver
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol : TCP
+        resources:
+          limits:
+            cpu: 2
+            memory: 500Mi      
+          requests:
+            cpu: 1
+            memory: 400Mi    
+        volumeMounts:
+        - mountPath: /root/.kube
+          name: kubeconfig
+          readOnly: true
+      restartPolicy: Always
+      nodeSelector: 
+        kubernetes.io/hostname: k8s-master
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+      - hostPath:
+          path: /root/.kube
+          type: DirectoryOrCreate
+        name: kubeconfig
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: kube-httpserver
+  name: kube-httpserver
+  namespace: default
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: kube-httpserver
