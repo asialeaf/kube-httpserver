@@ -1,4 +1,4 @@
-module git.harmonycloud.cn/yeyazhou/kube-httpserver
+module git.harmonycloud.cn/gitops/kube-httpserver
 
 go 1.16
 
