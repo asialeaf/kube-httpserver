@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/core/controller"
+	"git.harmonycloud.cn/gitops/kube-httpserver/pkg/core/controller"
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 )

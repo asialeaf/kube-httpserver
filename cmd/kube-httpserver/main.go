@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/server"
+	"git.harmonycloud.cn/gitops/kube-httpserver/pkg/server"
 )
 
 func main() {

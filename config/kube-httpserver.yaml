@@ -23,7 +23,7 @@ spec:
         - "cluster-endpoint"
       containers:
       - name: kube-httpserver
-        image: ko://git.harmonycloud.cn/yeyazhou/kube-httpserver/cmd/kube-httpserver
+        image: ko://git.harmonycloud.cn/gitops/kube-httpserver/cmd/kube-httpserver
         imagePullPolicy: IfNotPresent
         ports:
         - name: http

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/client/kubernetes"
-	"git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/core/pod"
+	"git.harmonycloud.cn/gitops/kube-httpserver/pkg/client/kubernetes"
+	"git.harmonycloud.cn/gitops/kube-httpserver/pkg/core/pod"
 )
 
 // GitOps Controller，Pod运行完成删除Pod
