@@ -22,9 +22,9 @@ spec:
     imagePullPolicy: IfNotPresent
     env:
     - name: GITSOURCE
-      value: "https://github.com/asialeaf/gitops.git"
+      value: "http://git.harmonycloud.cn/gitops/kube-gitops.git"
     - name: GITPATH
-      value: "deploy/"
+      value: "test/"
     - name: CALLBACK
       value: "http://10.96.221.127:8060/dingtalk/webhook1/send"
     name: gitops
