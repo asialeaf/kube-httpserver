@@ -13,7 +13,7 @@
 
 #### 部署步骤
 
-使用[ko](https://github.com/google/ko)一键部署(推荐)
+##### 使用[ko](https://github.com/google/ko)一键部署(推荐)
 
 提前安装ko
 
@@ -133,21 +133,22 @@ go install github.com/google/ko@latest
    ```
 
    
-   ###### 使用Dockerfile部署
    
-   构建镜像并上传至镜像仓库
-   
+##### 使用Dockerfile部署
+
+1. 构建镜像并上传至镜像仓库
+
    ```shell
    docker build -t local.harbor.io/kube-httpserver:v1.0 .
    docker push local.harbor.io/kube-httpserver:v1.0
    ```
-   
-   修改deployment.yaml内镜像地址
-   
+
+2. 修改deployment.yaml内镜像地址
+
    ```shell
    vim deploy/kube-httpserver.yaml
    ```
-   
+
    ```yaml
    apiVersion: apps/v1
    kind: Deployment
@@ -225,12 +226,14 @@ go install github.com/google/ko@latest
      type: NodePort
    
    ```
-   
-   创建部署
-   
+
+3. 创建部署
+
    ```
    kubectl apply -f deploy/kube-httpserver.yaml
    ```
+
+
 
 #### Demo
 
