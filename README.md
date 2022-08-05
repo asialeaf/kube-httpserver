@@ -2,11 +2,18 @@
 
 使用HTTP Server API 接口创建部署指定GitSource的应用
 
+#### 工作流程
+
+![gitops](images/gitops.png)
+
+- Kube-httpserver：接收用户的git仓库来源的部署需求，来源文件为k8s部署yaml文件
+- [Kube-gitops](http://git.harmonycloud.cn/gitops/kube-gitops.git)：负责创建用户发来的yaml文件对应的部署项目，gitops pod由Kube-httpserver连接上目标集群后在目标集群创建
+
 
 
 #### 部署步骤
 
-使用[ko](https://github.com/google/ko)一键部署
+使用[ko](https://github.com/google/ko)一键部署(推荐)
 
 提前安装ko
 
@@ -50,7 +57,7 @@ go install github.com/google/ko@latest
            - "cluster-endpoint"
          containers:
          - name: kube-httpserver
-           image: ko://git.harmonycloud.cn/yeyazhou/kube-httpserver/cmd/kube-httpserver
+           image: ko://git.harmonycloud.cn/gitops/kube-httpserver/cmd/kube-httpserver
            imagePullPolicy: IfNotPresent
            ports:
            - name: http
@@ -126,6 +133,104 @@ go install github.com/google/ko@latest
    ```
 
    
+   ###### 使用Dockerfile部署
+   
+   构建镜像并上传至镜像仓库
+   
+   ```shell
+   docker build -t local.harbor.io/kube-httpserver:v1.0 .
+   docker push local.harbor.io/kube-httpserver:v1.0
+   ```
+   
+   修改deployment.yaml内镜像地址
+   
+   ```shell
+   vim deploy/kube-httpserver.yaml
+   ```
+   
+   ```yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: kube-httpserver
+     namespace: default
+     labels:
+       app.kubernetes.io/version: devel
+       app.kubernetes.io/name: kube-httpserver
+   spec:
+     selector:
+       matchLabels:
+         app: kube-httpserver
+         app.kubernetes.io/version: devel
+         app.kubernetes.io/name: kube-httpserver
+     template:
+       metadata:
+         labels:
+           app: kube-httpserver
+           app.kubernetes.io/version: devel
+           app.kubernetes.io/name: kube-httpserver
+       spec:
+         hostAliases:
+         - ip : "192.168.50.225"     #apiserver 主机域名解析
+           hostnames:
+           - "cluster-endpoint"
+         containers:
+         - name: kube-httpserver
+           image: local.harbor.io/kube-httpserver:v1.0      #修改为实际镜像仓库地址
+           imagePullPolicy: IfNotPresent
+           ports:
+           - name: http
+             containerPort: 8080
+             protocol : TCP
+           resources:
+             limits:
+               cpu: 2
+               memory: 500Mi      
+             requests:
+               cpu: 1
+               memory: 400Mi    
+           volumeMounts:
+           - mountPath: /root/.kube
+             name: kubeconfig
+             readOnly: true
+         restartPolicy: Always
+         nodeSelector: 
+           kubernetes.io/hostname: k8s-master       #如需部署到其他节点需修改
+         tolerations:
+         - effect: NoSchedule
+           operator: Exists
+         volumes:
+         - hostPath:
+             path: /root/.kube        #使用本地集群config
+             type: DirectoryOrCreate
+           name: kubeconfig
+   
+   ---
+   
+   apiVersion: v1
+   kind: Service
+   metadata:
+     labels:
+       app.kubernetes.io/version: devel
+       app.kubernetes.io/name: kube-httpserver
+     name: kube-httpserver
+     namespace: default
+   spec:
+     ports:
+       - name: http
+         port: 8080
+         targetPort: 8080
+     selector:
+       app: kube-httpserver
+     type: NodePort
+   
+   ```
+   
+   创建部署
+   
+   ```
+   kubectl apply -f deploy/kube-httpserver.yaml
+   ```
 
 #### Demo
 
