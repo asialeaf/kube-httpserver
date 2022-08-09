@@ -126,7 +126,7 @@ go install github.com/google/ko@latest
     - using env:	export GIN_MODE=release
     - using code:	gin.SetMode(gin.ReleaseMode)
    
-   [GIN-debug] POST   /gitops/deploy            --> git.harmonycloud.cn/yeyazhou/kube-httpserver/pkg/server.Demo.func1 (3 handlers)
+   [GIN-debug] POST   /gitops/deploy            --> git.harmonycloud.cn/gitops/kube-httpserver/pkg/server.Demo.func1 (3 handlers)
    [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
    Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
    [GIN-debug] Listening and serving HTTP on :8080
