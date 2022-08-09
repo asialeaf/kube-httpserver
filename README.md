@@ -139,8 +139,8 @@ go install github.com/google/ko@latest
 1. 构建镜像并上传至镜像仓库
 
    ```shell
-   docker build -t local.harbor.io/kube-httpserver:v1.0 .
-   docker push local.harbor.io/kube-httpserver:v1.0
+   docker build -t local.harbor.io/gitops/kube-httpserver:v1.0 .
+   docker push local.harbor.io/gitops/kube-httpserver:v1.0
    ```
 
 2. 修改deployment.yaml内镜像地址
