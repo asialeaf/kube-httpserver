@@ -1,6 +1,9 @@
 # Build the kube-httpserver binary
 FROM golang:1.17 as builder
 
+# Update Repo
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 RUN apt-get -y update && apt-get -y install upx
 
 WORKDIR /workspace
