@@ -25,7 +25,7 @@ go install github.com/google/ko@latest
 
    ```shell
    #设置镜像仓库地址，ko会把制作好的镜像push该仓库。
-   export KO_DOCKER_REPO=docker.io/asialeaf
+   export KO_DOCKER_REPO=local.harbor.io/gitops
    #部署
    ko apply -Rf config/kube-httpserver.yaml
    ```
@@ -177,7 +177,7 @@ go install github.com/google/ko@latest
            - "cluster-endpoint"
          containers:
          - name: kube-httpserver
-           image: local.harbor.io/kube-httpserver:v1.0      #修改为实际镜像仓库地址
+           image: local.harbor.io/gitops/kube-httpserver:v1.0      #修改为实际镜像仓库地址
            imagePullPolicy: IfNotPresent
            ports:
            - name: http
@@ -267,8 +267,8 @@ go install github.com/google/ko@latest
 
    ```json
    {
-       "gitsource": "https://github.com/asialeaf/gitops.git",
-       "gitpath": "deploy/",
+       "gitsource": "http://git.harmonycloud.cn/gitops/kube-gitops.git",
+       "gitpath": "test/",
        "callback": "http://10.96.221.127:8060/dingtalk/webhook1/send",
        "clustername": "test"
    }
