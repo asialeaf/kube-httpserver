@@ -118,20 +118,11 @@ go install github.com/google/ko@latest
    
 
    ```shell
-   [root@k8s-master kube-httpserver]# kubectl logs -f kube-httpserver-bbb798857-ggdjg
-   gitops httpserver ...
-   [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
-   
-   [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
-    - using env:	export GIN_MODE=release
-    - using code:	gin.SetMode(gin.ReleaseMode)
-   
-   [GIN-debug] POST   /gitops/deploy            --> git.harmonycloud.cn/gitops/kube-httpserver/pkg/server.Demo.func1 (3 handlers)
-   [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
-   Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
-   [GIN-debug] Listening and serving HTTP on :8080
+   [root@k8s-master deploy]# kubectl logs -f kube-httpserver-6954b56697-dr5mz
+   level=info ts=2022-08-11T08:55:40.649Z caller=server.go:18 component=web msg="Starting kube-httpserver"
+   level=info ts=2022-08-11T08:55:40.649Z caller=server.go:40 component=web msg="Kube-httpserver started. Listening and serving HTTP on :8080"
    ```
-
+   
    
    
 ##### 使用Dockerfile部署
