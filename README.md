@@ -27,10 +27,10 @@ go install github.com/google/ko@latest
    #设置镜像仓库地址，ko会把制作好的镜像push该仓库。
    export KO_DOCKER_REPO=local.harbor.io/gitops
    #部署
-   ko apply -Rf config/kube-httpserver.yaml
+   ko apply -Rf config/kube-httpserver_ko.yaml
    ```
 
-   kube-httpserver.yaml
+   kube-httpserver_ko.yaml
    ```yaml
    apiVersion: apps/v1
    kind: Deployment
