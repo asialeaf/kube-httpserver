@@ -1,5 +1,9 @@
 package server
 
+const (
+	ListenAddress = ":8080"
+)
+
 type Data struct {
 	GitSource   string `form:"gitsource" json:"gitsource" binding:"required"`
 	GitPath     string `form:"gitpath" json:"gitpath" binding:"required"`

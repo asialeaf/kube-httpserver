@@ -12,10 +12,10 @@ import (
 )
 
 func Demo(logger log.Logger) {
-
 	if logger == nil {
 		logger = log.NewNopLogger()
 	}
+	level.Info(logger).Log("msg", "Starting kube-httpserver")
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 
@@ -37,6 +37,6 @@ func Demo(logger log.Logger) {
 		c.JSON(http.StatusOK, gin.H{"status": "success"})
 
 	})
-
-	router.Run(":8080")
+	level.Info(logger).Log("msg", fmt.Sprintf("Kube-httpserver started. Listening and serving HTTP on %s", ListenAddress))
+	router.Run(ListenAddress)
 }
