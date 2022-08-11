@@ -20,7 +20,7 @@ ENV GO111MODULE=on
 ENV GOPROXY="https://goproxy.cn,direct"
 
 RUN go mod download && \
-    go build -a -o kube-httpserver cmd/kubeadmission-webhook/main.go && \
+    go build -a -o kube-httpserver cmd/kube-httpserver/main.go && \
     upx kube-httpserver
 
 FROM alpine:3.13
