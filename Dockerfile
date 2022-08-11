@@ -1,5 +1,5 @@
 # Build the kube-httpserver binary
-FROM golang:1.17 as builder
+FROM golang:1.18 as builder
 
 RUN apt-get -y update && apt-get -y install upx
 
