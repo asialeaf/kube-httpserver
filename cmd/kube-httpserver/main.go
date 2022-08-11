@@ -1,14 +1,16 @@
 package main
 
 import (
-	"fmt"
-
 	"git.harmonycloud.cn/gitops/kube-httpserver/pkg/server"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+	"github.com/prometheus/common/promlog"
 )
 
 func main() {
-	// fmt.Println("clinet-go 测试...")
-	// kubeclient.ClientTest()
-	fmt.Println("gitops httpserver ...")
-	server.Demo()
+	promlogConfig := &promlog.Config{}
+	logger := promlog.New(promlogConfig)
+	level.Info(logger).Log("msg", "Starting kube-httpserver")
+	webLogger := log.With(logger, "component", "web")
+	server.Demo(webLogger)
 }
