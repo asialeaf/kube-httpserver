@@ -11,9 +11,12 @@
 
 
 
-#### 部署步骤
+#### 部署
 
-##### 使用[ko](https://github.com/google/ko)一键部署(推荐)
+- 使用[ko](https://github.com/google/ko)一键部署(推荐) 
+- 使用Dockerfile部署
+
+##### 使用[ko](https://github.com/google/ko)一键部署
 
 提前安装ko
 
@@ -115,16 +118,13 @@ go install github.com/google/ko@latest
    kubectl logs -f kube-httpserver-bbb798857-ggdjg
    ```
 
-   
-
    ```shell
-   [root@k8s-master deploy]# kubectl logs -f kube-httpserver-6954b56697-dr5mz
    level=info ts=2022-08-11T08:55:40.649Z caller=server.go:18 component=web msg="Starting kube-httpserver"
    level=info ts=2022-08-11T08:55:40.649Z caller=server.go:40 component=web msg="Kube-httpserver started. Listening and serving HTTP on :8080"
    ```
    
    
-   
+
 ##### 使用Dockerfile部署
 
 1. 构建镜像并上传至镜像仓库
